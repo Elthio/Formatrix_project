@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trainer Registration - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --accent-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .registration-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .registration-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary-color);
+  }
+
+  .registration-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .registration-header p {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .registration-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+  }
+
+  .progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0 1rem;
+  }
+
+  .progress-step::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -50%;
+    width: 100%;
+    height: 3px;
+    background: var(--light-color);
+    z-index: 0;
+  }
+
+  .progress-step:first-child::before {
+    display: none;
+  }
+
+  .step-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--light-color);
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  .progress-step.active .step-number {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  .progress-step.completed .step-number {
+    background: var(--success-color);
+    color: white;
+  }
+
+  .step-label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-top: 0.5rem;
+  }
+
+  .registration-form {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+  }
+
+  .form-step {
+    display: none;
+    padding: 2rem;
+  }
+
+  .form-step.active {
+    display: block;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--light-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+  }
+
+  .form-text {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    margin-top: 0.25rem;
+  }
+
+  .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-prev {
+    background: var(--light-color);
+    color: var(--dark-color);
+  }
+
+  .btn-next {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  .btn-submit {
+    background: var(--success-color);
+    color: white;
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-col {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    .registration-header h2 {
+      font-size: 2rem;
+    }
+
+    .registration-progress {
+      margin-bottom: 2rem;
+    }
+
+    .form-step {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .form-col {
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .form-buttons {
+      flex-direction: column-reverse;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .registration-container {
+      margin: 1rem auto;
+    }
+
+    .registration-header h2 {
+      font-size: 1.75rem;
+    }
+
+    .step-label {
+      display: none;
+    }
+
+    .form-step {
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="registration-container">
+  <div class="registration-header">
+    <h2>Trainer Registration</h2>
+    <p>Join our community of trainers and share your expertise</p>
+  </div>
+
+  <div class="registration-progress">
+    <div class="progress-step active" id="step-1-indicator">
+      <div class="step-number">1</div>
+      <div class="step-label">Account</div>
+    </div>
+    <div class="progress-step" id="step-2-indicator">
+      <div class="step-number">2</div>
+      <div class="step-label">Profile</div>
+    </div>
+    <div class="progress-step" id="step-3-indicator">
+      <div class="step-number">3</div>
+      <div class="step-label">Expertise</div>
+    </div>
+    <div class="progress-step" id="step-4-indicator">
+      <div class="step-number">4</div>
+      <div class="step-label">Finalization</div>
+    </div>
+  </div>
+
+  <div class="registration-form">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Step 1: Account Information -->
+      <div class="form-step active" id="step-1">
+        <h3 class="mb-4">Create your account</h3>
+        
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" name="username" required>
+          <small class="form-text">Choose a unique username</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" required>
+          <small class="form-text">We will never share your email</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password1" required>
+          </div>
+          <div class="form-col">
+            <label class="form-label">Confirm password</label>
+            <input type="password" class="form-control" name="password2" required>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-next" onclick="nextStep(1, 2)">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Personal Information -->
+      <div class="form-step" id="step-2">
+        <h3 class="mb-4">Personal Information</h3>
+        
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" name="first_name" required>
+          </div>
+          <div class="form-col">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" name="last_name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" name="date_naissance" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-control" name="telephone" required>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(2, 1)">Previous</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(2, 3)">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Trainer Profile -->
+      <div class="form-step" id="step-3">
+        <h3 class="mb-4">Trainer Profile</h3>
+
+        <div class="form-group">
+          <label class="form-label">Specialties</label>
+          <select class="form-control" name="specialites" multiple required>
+            <option value="informatique">Computing</option>
+            <option value="langues">Languages</option>
+            <option value="management">Management</option>
+            <option value="marketing">Marketing</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Expertise Level</label>
+          <select class="form-control" name="niveau_expertise" required>
+            <option value="junior">Junior (1-3 years)</option>
+            <option value="intermediaire">Intermediate (4-7 years)</option>
+            <option value="senior">Senior (8+ years)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Resume/CV</label>
+          <input type="file" class="form-control" name="cv" accept=".pdf,.doc,.docx">
+          <small class="form-text">Accepted formats: PDF, DOC, DOCX</small>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(3, 2)">Previous</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(3, 4)">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Summary -->
+      <div class="form-step" id="step-4">
+        <h3 class="mb-4">Summary</h3>
+        
+        <div id="recap-content" class="mb-4">
+          <!-- Content will be filled dynamically by JavaScript -->
+        </div>
+
+        <div class="form-group">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="terms" required>
+            <label class="form-check-label" for="terms">
+              I accept the terms of use and privacy policy
+            </label>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(4, 3)">Previous</button>
+          <button type="submit" class="btn btn-submit">Complete Registration</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize steps
+  updateProgressBar(1);
+  
+  // Password validation
+  const password1 = document.querySelector('input[name="password1"]');
+  const password2 = document.querySelector('input[name="password2"]');
+  
+  password2.addEventListener('input', function() {
+    if (password1.value !== password2.value) {
+      password2.setCustomValidity('Passwords do not match');
+    } else {
+      password2.setCustomValidity('');
+    }
+  });
+});
+
+function updateProgressBar(currentStep) {
+  const steps = document.querySelectorAll('.progress-step');
+  steps.forEach((step, index) => {
+    if (index + 1 < currentStep) {
+      step.classList.add('completed');
+      step.classList.remove('active');
+    } else if (index + 1 === currentStep) {
+      step.classList.add('active');
+      step.classList.remove('completed');
+    } else {
+      step.classList.remove('completed', 'active');
+    }
+  });
+}
+
+function validateStep(step) {
+  const currentStep = document.getElementById(`step-${step}`);
+  const inputs = currentStep.querySelectorAll('input[required], select[required]');
+  let isValid = true;
+  
+  inputs.forEach(input => {
+    if (!input.value) {
+      isValid = false;
+      input.classList.add('is-invalid');
+    } else {
+      input.classList.remove('is-invalid');
+    }
+  });
+  
+  return isValid;
+}
+
+function nextStep(currentStep, nextStep) {
+  if (validateStep(currentStep)) {
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${nextStep}`).classList.add('active');
+    updateProgressBar(nextStep);
+    
+    if (nextStep === 4) {
+      updateRecapContent();
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevStep(currentStep, prevStep) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  document.getElementById(`step-${prevStep}`).classList.add('active');
+  updateProgressBar(prevStep);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateRecapContent() {
+  const recap = document.getElementById('recap-content');
+  const formData = new FormData(document.querySelector('form'));
+  let recapHTML = '<div class="recap-section">';
+  
+  for (let [key, value] of formData.entries()) {
+    if (key !== 'password1' && key !== 'password2' && key !== 'csrfmiddlewaretoken') {
+      recapHTML += `
+        <div class="recap-item">
+          <strong>${key}:</strong> ${value}
+        </div>
+      `;
+    }
+  }
+  
+  recapHTML += '</div>';
+  recap.innerHTML = recapHTML;
+}
+</script>
+{% endblock %}

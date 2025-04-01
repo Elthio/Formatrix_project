@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Course - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if form.instance.pk %}Edit{% else %}Create{% endif %} Course
+    </h1>
+    <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    
+    <!-- Basic Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Basic Information
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-8">
+          <div class="form-group {% if form.nom_cours.errors %}has-error{% endif %}">
+            <label for="{{ form.nom_cours.id_for_label }}">
+              Course Name <span class="text-danger">*</span>
+            </label>
+            {{ form.nom_cours }}
+            {% if form.nom_cours.errors %}
+            <div class="error-message">
+              {% for error in form.nom_cours.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.nom_cours.help_text %}
+            <small class="form-text text-muted">{{ form.nom_cours.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group {% if form.type_cours.errors %}has-error{% endif %}">
+            <label for="{{ form.type_cours.id_for_label }}">
+              Course Type <span class="text-danger">*</span>
+            </label>
+            {{ form.type_cours }}
+            {% if form.type_cours.errors %}
+            <div class="error-message">
+              {% for error in form.type_cours.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.type_cours.help_text %}
+            <small class="form-text text-muted">{{ form.type_cours.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 course-duration-hours">
+          <div class="form-group {% if form.duree_heures.errors %}has-error{% endif %}">
+            <label for="{{ form.duree_heures.id_for_label }}">
+              Duration (hours) <span class="text-danger">*</span>
+            </label>
+            {{ form.duree_heures }}
+            {% if form.duree_heures.errors %}
+            <div class="error-message">
+              {% for error in form.duree_heures.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.duree_heures.help_text %}
+            <small class="form-text text-muted">{{ form.duree_heures.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6 course-duration-months">
+          <div class="form-group {% if form.periode_mois.errors %}has-error{% endif %}">
+            <label for="{{ form.periode_mois.id_for_label }}">
+              Duration (months) <span class="text-danger">*</span>
+            </label>
+            {{ form.periode_mois }}
+            {% if form.periode_mois.errors %}
+            <div class="error-message">
+              {% for error in form.periode_mois.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.periode_mois.help_text %}
+            <small class="form-text text-muted">{{ form.periode_mois.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.niveau.errors %}has-error{% endif %}">
+            <label for="{{ form.niveau.id_for_label }}">
+              Level <span class="text-danger">*</span>
+            </label>
+            {{ form.niveau }}
+            {% if form.niveau.errors %}
+            <div class="error-message">
+              {% for error in form.niveau.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.niveau.help_text %}
+            <small class="form-text text-muted">{{ form.niveau.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.prix_reference.errors %}has-error{% endif %}">
+            <label for="{{ form.prix_reference.id_for_label }}">
+              Reference Price (€) <span class="text-danger">*</span>
+            </label>
+            {{ form.prix_reference }}
+            {% if form.prix_reference.errors %}
+            <div class="error-message">
+              {% for error in form.prix_reference.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.prix_reference.help_text %}
+            <small class="form-text text-muted">{{ form.prix_reference.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Detailed Description -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-align-left"></i>
+        Detailed Description
+      </h3>
+      
+      <div class="form-group {% if form.objectifs.errors %}has-error{% endif %}">
+        <label for="{{ form.objectifs.id_for_label }}">
+          Objectives <span class="text-danger">*</span>
+        </label>
+        {{ form.objectifs }}
+        {% if form.objectifs.errors %}
+        <div class="error-message">
+          {% for error in form.objectifs.errors %}
+          {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if form.objectifs.help_text %}
+        <small class="form-text text-muted">{{ form.objectifs.help_text }}</small>
+        {% endif %}
+      </div>
+      
+      <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+        <label for="{{ form.description.id_for_label }}">
+          Detailed Description
+        </label>
+        {{ form.description }}
+        {% if form.description.errors %}
+        <div class="error-message">
+          {% for error in form.description.errors %}
+          {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if form.description.help_text %}
+        <small class="form-text text-muted">{{ form.description.help_text }}</small>
+        {% endif %}
+      </div>
+      
+      <div class="form-group {% if form.prerequis.errors %}has-error{% endif %}">
+        <label for="{{ form.prerequis.id_for_label }}">
+          Prerequisites
+        </label>
+        {{ form.prerequis }}
+        {% if form.prerequis.errors %}
+        <div class="error-message">
+          {% for error in form.prerequis.errors %}
+          {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if form.prerequis.help_text %}
+        <small class="form-text text-muted">{{ form.prerequis.help_text }}</small>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Additional Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-cog"></i>
+        Additional Information
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.code_certification.errors %}has-error{% endif %}">
+            <label for="{{ form.code_certification.id_for_label }}">
+              Certification Code
+            </label>
+            {{ form.code_certification }}
+            {% if form.code_certification.errors %}
+            <div class="error-message">
+              {% for error in form.code_certification.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.code_certification.help_text %}
+            <small class="form-text text-muted">{{ form.code_certification.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.materiel_requis.errors %}has-error{% endif %}">
+            <label for="{{ form.materiel_requis.id_for_label }}">
+              Required Equipment
+            </label>
+            {{ form.materiel_requis }}
+            {% if form.materiel_requis.errors %}
+            <div class="error-message">
+              {% for error in form.materiel_requis.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.materiel_requis.help_text %}
+            <small class="form-text text-muted">{{ form.materiel_requis.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.image_cours.errors %}has-error{% endif %}">
+            <label for="{{ form.image_cours.id_for_label }}">
+              Course Image
+            </label>
+            {% if form.instance.image_cours %}
+            <div class="current-image mb-2">
+              <img src="{{ form.instance.image_cours.url }}" alt="Current course image" class="img-thumbnail" style="max-height: 100px;">
+              <div class="form-check mt-1">
+                <input class="form-check-input" type="checkbox" name="delete_image" id="delete_image">
+                <label class="form-check-label" for="delete_image">
+                  Delete image
+                </label>
+              </div>
+            </div>
+            {% endif %}
+            {{ form.image_cours }}
+            {% if form.image_cours.errors %}
+            <div class="error-message">
+              {% for error in form.image_cours.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.image_cours.help_text %}
+            <small class="form-text text-muted">{{ form.image_cours.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.statut_approbation.errors %}has-error{% endif %}">
+            <label for="{{ form.statut_approbation.id_for_label }}">
+              Approval Status <span class="text-danger">*</span>
+            </label>
+            {{ form.statut_approbation }}
+            {% if form.statut_approbation.errors %}
+            <div class="error-message">
+              {% for error in form.statut_approbation.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.statut_approbation.help_text %}
+            <small class="form-text text-muted">{{ form.statut_approbation.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Submission buttons -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i>
+        {% if form.instance.pk %}Update{% else %}Create{% endif %}
+      </button>
+      <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize fields with Select2
+    $('#id_niveau').select2({
+      placeholder: "Select a level",
+      allowClear: true
+    });
+    
+    $('#id_type_cours').select2({
+      placeholder: "Select a course type",
+      allowClear: true
+    });
+    
+    $('#id_statut_approbation').select2({
+      placeholder: "Select approval status",
+      allowClear: true
+    });
+    
+    // Show/hide duration fields based on course type
+    function toggleDurationFields() {
+      var courseType = $('#id_type_cours').val();
+      
+      if (courseType === 'long') {
+        $('.course-duration-months').show();
+        $('.course-duration-hours').hide();
+      } else {
+        $('.course-duration-months').hide();
+        $('.course-duration-hours').show();
+      }
+    }
+    
+    // Call initially to set correct state
+    toggleDurationFields();
+    
+    // Add event listener for changes
+    $('#id_type_cours').on('change', toggleDurationFields);
+    
+    // Initialize rich text editors
+    if (typeof CKEDITOR !== 'undefined') {
+      CKEDITOR.replace('id_description', {
+        height: 200,
+        toolbar: [
+          { name: 'document', items: [ 'Source' ] },
+          { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', '-', 'Undo', 'Redo' ] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'BlockQuote' ] },
+          { name: 'links', items: [ 'Link', 'Unlink' ] },
+          { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+          { name: 'styles', items: [ 'Styles', 'Format' ] }
+        ]
+      });
+      
+      CKEDITOR.replace('id_objectifs', {
+        height: 150,
+        toolbar: [
+          { name: 'document', items: [ 'Source' ] },
+          { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', '-', 'Undo', 'Redo' ] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent' ] },
+          { name: 'links', items: [ 'Link', 'Unlink' ] }
+        ]
+      });
+      
+      CKEDITOR.replace('id_prerequis', {
+        height: 150,
+        toolbar: [
+          { name: 'document', items: [ 'Source' ] },
+          { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', '-', 'Undo', 'Redo' ] },
+          { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ] },
+          { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent' ] },
+          { name: 'links', items: [ 'Link', 'Unlink' ] }
+        ]
+      });
+    }
+  });
+</script>
+{% endblock %}

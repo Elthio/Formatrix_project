@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  {% load static %}
+  <title>{% block title %}Formatrix{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/kaiadmin/favicon.ico' %}" type="image/x-icon" />
+
+  <!-- Fonts and icons -->
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+  <script>
+    WebFont.load({
+      google: { families: ["Public Sans:300,400,500,600,700"] },
+      custom: {
+        families: [
+          "Font Awesome 5 Solid",
+          "Font Awesome 5 Regular",
+          "Font Awesome 5 Brands",
+          "simple-line-icons",
+        ],
+        urls: ["{% static 'css/fonts.min.css' %}"],
+      },
+      active: function () {
+        sessionStorage.fonts = true;
+      },
+    });
+  </script>
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/plugins.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/kaiadmin.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/file-upload.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/kaiadmin.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Global variables -->
+  <script>
+    const MEDIA_URL = "{{ MEDIA_URL }}";
+  </script>
+  
+  <style>
+    /* Avatar styles for profile pictures and initials */
+    .avatar-sm {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-sm img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    /* Avatar background colors based on ID last digit */
+    .avatar-color-1 { background-color: #F44336; }
+    .avatar-color-2 { background-color: #E91E63; }
+    .avatar-color-3 { background-color: #9C27B0; }
+    .avatar-color-4 { background-color: #673AB7; }
+    .avatar-color-5 { background-color: #3F51B5; }
+    .avatar-color-6 { background-color: #2196F3; }
+    .avatar-color-7 { background-color: #03A9F4; }
+    .avatar-color-8 { background-color: #00BCD4; }
+    .avatar-color-9 { background-color: #009688; }
+    .avatar-color-0 { background-color: #4CAF50; }
+    
+    /* Custom sidebar styles */
+    .sidebar {
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar-wrapper {
+      padding: 10px 0;
+    }
+    
+    .nav-item {
+      margin-bottom: 3px;
+    }
+    
+    .nav-item > a {
+      padding: 12px 15px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-item > a:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-item > a > i {
+      font-size: 1rem;
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .nav-item > a > p {
+      font-size: 0.9rem;
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    .nav-item.active > a {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-section {
+      margin-top: 15px;
+      padding: 0 15px;
+    }
+    
+    .text-section {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 10px;
+    }
+    
+    .nav-collapse li {
+      margin-bottom: 5px;
+    }
+    
+    .nav-collapse a {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-collapse a:hover, 
+    .nav-collapse a.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+  
+  {% block splash %}{% endblock %}
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  {% if user.is_authenticated %}
+  <div class="wrapper">
+    <!-- Sidebar for connected users -->
+    <div class="sidebar" data-background-color="blue">
+      <div class="sidebar-logo">
+        <!-- Logo Header -->
+        <div class="logo-header" data-background-color="blue">
+          <a href="{% url 'home' %}" class="logo">
+            <span class="text-white">Formatrix</span>
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar">
+              <i class="fas fa-bars"></i>
+            </button>
+            <button class="btn btn-toggle sidenav-toggler">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+        </div>
+        <!-- End Logo Header -->
+      </div>
+      <div class="sidebar-wrapper scrollbar scrollbar-inner">
+        <div class="sidebar-content">
+          <ul class="nav nav-secondary">
+            <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+              <a href="{% url 'home' %}">
+                <i class="fas fa-home"></i>
+                <p>Home</p>
+              </a>
+            </li>
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Training Management</h4>
+            </li>
+            
+            <li class="nav-item {% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#coursesMenu" {% if 'cours' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-book"></i>
+                <p>Courses</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'cours' in request.resolver_match.url_name %}show{% endif %}" id="coursesMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'cours:cours-list' %}" class="{% if request.resolver_match.url_name == 'cours-list' %}active{% endif %}">
+                      <span class="sub-item">All courses</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'cours:cours-create' %}" class="{% if request.resolver_match.url_name == 'cours-create' %}active{% endif %}">
+                      <span class="sub-item">Add a course</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#seancesMenu" {% if 'seance' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-calendar-alt"></i>
+                <p>Sessions</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'seance' in request.resolver_match.url_name %}show{% endif %}" id="seancesMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'seances:seance-list' %}" class="{% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
+                      <span class="sub-item">All sessions</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'seances:seance-create' %}" class="{% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
+                      <span class="sub-item">Add a session</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'seances:seance-list' %}?filtre=absences" class="{% if request.resolver_match.url_name == 'seance-list' and request.GET.filtre == 'absences' %}active{% endif %}">
+                      <span class="sub-item">Absence management</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Registrations</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'inscription' in request.resolver_match.url_name %}show{% endif %}" id="inscriptionsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-list' %}" class="{% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
+                      <span class="sub-item">All registrations</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-create' %}" class="{% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
+                      <span class="sub-item">Add a registration</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-multiple' %}" class="{% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
+                      <span class="sub-item">Multiple registration</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            {% if user.is_staff %}
+            <li class="nav-item {% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#paiementsMenu" {% if 'paiement' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-money-bill-wave"></i>
+                <p>Payments</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'paiement' in request.resolver_match.url_name %}show{% endif %}" id="paiementsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'paiements:tableau-bord' %}" class="{% if request.resolver_match.url_name == 'tableau-bord' %}active{% endif %}">
+                      <span class="sub-item">Dashboard</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-list' %}" class="{% if request.resolver_match.url_name == 'paiement-list' %}active{% endif %}">
+                      <span class="sub-item">All payments</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-create' %}" class="{% if request.resolver_match.url_name == 'paiement-create' %}active{% endif %}">
+                      <span class="sub-item">Add a payment</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:plan-list' %}" class="{% if request.resolver_match.url_name == 'plan-list' %}active{% endif %}">
+                      <span class="sub-item">Payment plans</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-formateur-list' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-list' %}active{% endif %}">
+                      <span class="sub-item">Trainer payments</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-formateur-create' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-create' %}active{% endif %}">
+                      <span class="sub-item">Pay a trainer</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:facture-list' %}" class="{% if request.resolver_match.url_name == 'facture-list' %}active{% endif %}">
+                      <span class="sub-item">Invoices</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:generer-facture' %}" class="{% if request.resolver_match.url_name == 'generer-facture' %}active{% endif %}">
+                      <span class="sub-item">Generate an invoice</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">People Management</h4>
+            </li>
+            
+            <li class="nav-item {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#apprenantsMenu" {% if 'apprenant' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i>
+                <p>Learners</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'apprenant' in request.resolver_match.url_name %}show{% endif %}" id="apprenantsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'apprenants:apprenant-list' %}" class="{% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
+                      <span class="sub-item">All learners</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'apprenants:apprenant-create' %}" class="{% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
+                      <span class="sub-item">Add a learner</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            {% if user.is_staff %}
+            <li class="nav-item {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#clientsMenu" {% if 'client' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <p>Clients</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'client' in request.resolver_match.url_name %}show{% endif %}" id="clientsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="/clients/liste/" class="{% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+                      <span class="sub-item">All clients</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/clients/creer/" class="{% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
+                      <span class="sub-item">Add a client</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
+            
+            {% if user.is_staff %}
+            <li class="nav-item {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#formateursMenu" {% if 'formateur' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <p>Trainers</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'formateur' in request.resolver_match.url_name %}show{% endif %}" id="formateursMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'formateurs:formateur-list' %}" class="{% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
+                      <span class="sub-item">All trainers</span>
+                    </a>
+                  </li>
+                  {% if user.formateur_profile %}
+                  <li>
+                    <a href="{% url 'formateurs:formateur-cours' %}" class="{% if request.resolver_match.url_name == 'formateur-cours' %}active{% endif %}">
+                      <span class="sub-item">My courses</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </li>
+            {% endif %}
+            
+            {% if user.is_staff %}
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Analysis and Reports</h4>
+            </li>
+            
+            <li class="nav-item {% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#rapportsMenu" {% if 'rapport' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                <p>Statistical Reports</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'rapport' in request.resolver_match.url_name %}show{% endif %}" id="rapportsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'rapports:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                      <span class="sub-item">Dashboard</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:demographique' %}" class="{% if request.resolver_match.url_name == 'demographique' %}active{% endif %}">
+                      <span class="sub-item">Demographic report</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:ressources' %}" class="{% if request.resolver_match.url_name == 'ressources' %}active{% endif %}">
+                      <span class="sub-item">Resource usage</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:clients' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">
+                      <span class="sub-item">Client report</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            {% endif %}
+            
+            <!-- Debug Admin Status -->
+            <!-- Removed debug info section as requested -->
+            
+            {% if user.is_staff %}
+              <!-- Administration link commented out as requested -->
+              <!-- <li class="nav-item">
+                <a href="{% url 'admin:index' %}">
+                  <i class="fas fa-cog"></i>
+                  <p>Administration</p>
+                </a>
+              </li> -->
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- End Sidebar -->
+
+    <div class="main-panel">
+      <!-- Simplified navbar for connected users -->
+      <div class="main-header">
+        <nav class="navbar navbar-header navbar-expand-lg">
+          <div class="container-fluid">
+            <div class="d-flex align-items-center">
+              <button class="navbar-toggler sidenav-toggler" type="button">
+                <span class="navbar-toggler-icon">
+                  <i class="fas fa-bars"></i>
+                </span>
+              </button>
+            </div>
+            
+            <!-- User information and logout on the right -->
+            <ul class="navbar-nav ms-auto align-items-center">
+              <li class="nav-item">
+                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} me-3">
+                  {% if user.is_staff %}
+                    <i class="fas fa-user-shield me-1"></i>Administrator
+                  {% else %}
+                    <i class="fas fa-chalkboard-teacher me-1"></i>Trainer
+                  {% endif %}
+                </span>
+              </li>
+              
+              {% if user.is_staff %}
+              <!-- Notification icon for administrators -->
+              <li class="nav-item dropdown me-2">
+                <a class="nav-link btn-notification" href="#" id="navbarNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-bell"></i>
+                  <span id="notification-counter" class="notification-badge d-none">0</span>
+                </a>
+                <!-- Dropdown content will be loaded by AJAX -->
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow" aria-labelledby="navbarNotifications">
+                  <div class="text-center p-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mb-0 mt-1">Loading notifications...</p>
+                  </div>
+                </div>
+              </li>
+              {% endif %}
+              
+              <li class="nav-item dropdown user-profile">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="user-name me-1">{{ user.username }}</span>
+                  <i class="fas fa-user-circle"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-user-cog me-2"></i>Profile
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <form method="post" action="{% url 'logout' %}" class="px-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                  </form>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Content -->
+      <div class="content" style="padding-top: 70px; margin-top: 10px;">
+        {% block content %}{% endblock %}
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center">
+            <nav>
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Help</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Legal</a>
+                </li>
+              </ul>
+            </nav>
+            <div class="copyright">
+              &copy; {% now "Y" %} Formatrix. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  {% else %}
+  <!-- Non-authenticated page -->
+  <div class="guest-wrapper">
+    {% if not show_splash %}
+    <div class="main-header shadow-sm">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col-6">
+            <div class="logo py-3">
+              <a href="{% url 'home' %}" class="logo d-flex align-items-center text-primary text-decoration-none">
+                <i class="fas fa-graduation-cap me-2 fa-lg"></i>
+                <span class="fw-bold fs-4">Formatrix</span>
+              </a>
+            </div>
+          </div>
+          <div class="col-6 text-end">
+            <div class="auth-actions">
+              <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                <span>Login</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="content content-wrapper">
+      <div class="container-fluid p-0">
+        {% block guest_content %}{% endblock %}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center">
+          <nav>
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link" href="#">Help</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Legal</a>
+              </li>
+            </ul>
+          </nav>
+          <div class="copyright">
+            &copy; {% now "Y" %} Formatrix. All rights reserved.
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  {% endif %}
+
+  <!-- Core JS Files -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
+
+  <!-- jQuery UI -->
+  <script src="{% static 'js/plugin/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js' %}"></script>
+
+  <!-- jQuery Scrollbar -->
+  <script src="{% static 'js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+  <!-- Bootstrap Notify -->
+  <script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+  <!-- Kaiadmin JS -->
+  <script src="{% static 'js/kaiadmin.min.js' %}"></script>
+  <script src="{% static 'js/file-upload.js' %}"></script>
+  
+  {% block extra_js %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Debug information for sidebar
+      console.log("Debug: Initializing sidebar...");
+      
+      // Managing sidebar in mobile mode
+      const sidenavTogglers = document.querySelectorAll('.sidenav-toggler');
+      sidenavTogglers.forEach(function(toggler) {
+        toggler.addEventListener('click', function() {
+          document.body.classList.toggle('sidebar-open');
+        });
+      });
+      
+      // Initialize dropdown menus
+      var navItems = document.querySelectorAll('.nav-item');
+      console.log("Debug: Found " + navItems.length + " navigation items");
+      
+      navItems.forEach(function (item) {
+        var link = item.querySelector('[data-bs-toggle="collapse"]');
+        if (link) {
+          console.log("Debug: Processing menu item: " + (link.textContent || link.innerText).trim());
+          var menu = document.querySelector(link.getAttribute('href'));
+          if (menu) {
+            // Check if menu should be open
+            var shouldBeActive = item.classList.contains('active') ||
+              menu.querySelectorAll('.active').length > 0 ||
+              window.location.pathname.includes(link.getAttribute('href').substring(1));
+
+            if (shouldBeActive) {
+              console.log("Debug: Activating menu: " + (link.textContent || link.innerText).trim());
+              item.classList.add('active');
+              menu.classList.add('show');
+            }
+          }
+        }
+      });
+
+      // For the new template - activate submenu items
+      $(".nav-collapse a").each(function () {
+        if ($(this).attr('href') === window.location.pathname) {
+          $(this).addClass('active');
+          $(this).closest('.collapse').addClass('show');
+          $(this).closest('.nav-item').addClass('active');
+        }
+      });
+    });
+  </script>
+  {% endblock %}
+
+  <!-- Script pour charger les notifications -->
+  {% if user.is_authenticated and user.is_staff %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Function to update the notification counter
+      function updateNotificationCounter() {
+        fetch('{% url "notifications:get_unread_count" %}')
+          .then(response => response.json())
+          .then(data => {
+            const counter = document.getElementById('notification-counter');
+            if (counter) {
+              if (data.count > 0) {
+                counter.textContent = data.count;
+                counter.classList.remove('d-none');
+              } else {
+                counter.classList.add('d-none');
+              }
+            }
+          });
+      }
+      
+      // Update counter at loading
+      updateNotificationCounter();
+      
+      // Load notifications on click on the icon
+      const notificationButton = document.getElementById('navbarNotifications');
+      if (notificationButton) {
+        let isLoaded = false;
+        
+        notificationButton.addEventListener('click', function() {
+          if (!isLoaded) {
+            const dropdownMenu = this.nextElementSibling;
+            
+            // Load notifications via AJAX
+            fetch('{% url "notifications:notification_list" %}')
+              .then(response => response.text())
+              .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const notifications = Array.from(doc.querySelectorAll('.card-body .table-responsive tbody tr'))
+                  .map(row => {
+                    return {
+                      id: row.querySelector('a[href*="mark_notification_read"]')?.href.split('/').filter(Boolean).pop(),
+                      type: row.querySelector('.badge')?.innerText.trim() === 'Cours' ? 'new_course' : 'new_trainer',
+                      message: row.querySelectorAll('td')[1].innerText.trim(),
+                      date: row.querySelectorAll('td')[2].innerText.trim(),
+                      is_read: row.querySelectorAll('td')[3].innerText.trim() === 'Lu',
+                      related_id: row.querySelector('a[href*="detail"]')?.href.split('/').filter(Boolean).pop()
+                    };
+                  });
+                
+                // We'll manually create the dropdown content
+                let dropdownContent = `
+                  <div class="dropdown-header d-flex align-items-center py-3">
+                    <span class="h6 mb-0 flex-grow-1">Notifications</span>
+                    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Mark all as read</a>
+                  </div>
+                  <div class="dropdown-divider my-0"></div>
+                  <div class="notification-list overflow-auto" style="max-height: 300px;">`;
+                
+                if (notifications.length > 0) {
+                  notifications.forEach(notif => {
+                    const iconClass = notif.type === 'new_course' ? 'fa-book text-success' : 'fa-chalkboard-teacher text-info';
+                    const bgClass = notif.type === 'new_course' ? 'bg-success-light' : 'bg-info-light';
+                    
+                    dropdownContent += `
+                      <a href="#" class="dropdown-item d-flex align-items-center py-2 px-3 border-bottom notification-item ${!notif.is_read ? 'unread' : ''}" 
+                         data-id="${notif.id}" data-related-id="${notif.related_id}">
+                        <div class="flex-shrink-0 me-2">
+                          <div class="avatar avatar-sm ${bgClass} rounded">
+                            <i class="fas ${iconClass}"></i>
+                          </div>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                          <p class="mb-1 text-truncate">${notif.message}</p>
+                          <p class="small text-muted mb-0">${notif.date}</p>
+                        </div>
+                        ${!notif.is_read ? '<span class="badge bg-warning rounded-circle ms-1"></span>' : ''}
+                      </a>
+                    `;
+                  });
+                } else {
+                  dropdownContent += `
+                    <div class="text-center py-4">
+                      <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+                      <p class="text-muted">No notifications</p>
+                    </div>
+                  `;
+                }
+                
+                dropdownContent += `
+                  </div>
+                  <div class="dropdown-divider my-0"></div>
+                  <a href="{% url 'notifications:notification_list' %}" class="dropdown-item text-center py-2">
+                    <span class="text-primary">View all notifications</span>
+                  </a>
+                `;
+                
+                dropdownMenu.innerHTML = dropdownContent;
+                
+                // Add event listeners
+                initNotificationEvents();
+                
+                isLoaded = true;
+              });
+          }
+        });
+        
+        // Function to initialize notification events
+        function initNotificationEvents() {
+          // Mark a notification as read on click
+          const notificationItems = document.querySelectorAll('.notification-item');
+          notificationItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+              e.preventDefault();
+              const notificationId = this.dataset.id;
+              const relatedId = this.dataset.relatedId;
+              const notificationType = this.querySelector('.avatar i').classList.contains('fa-book') ? 'new_course' : 'new_trainer';
+              
+              // Mark as read via AJAX
+              fetch(`{% url 'notifications:mark_notification_read' 0 %}`.replace('0', notificationId), {
+                method: 'GET',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+              .then(response => response.json())
+              .then(data => {
+                // Remove unread class
+                this.classList.remove('unread');
+                this.querySelector('.badge')?.remove();
+                
+                // Update counter
+                updateNotificationCounter();
+                
+                // Redirect to the corresponding page
+                if (notificationType === 'new_course') {
+                  window.location.href = `/cours/detail/${relatedId}/`;
+                } else if (notificationType === 'new_trainer') {
+                  window.location.href = `/formateurs/detail/${relatedId}/`;
+                }
+              });
+            });
+          });
+          
+          // Mark all notifications as read
+          document.getElementById('mark-all-read')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            fetch(`{% url 'notifications:mark_all_read' %}`, {
+              method: 'GET',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Visual update
+              document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+                item.querySelector('.badge')?.remove();
+              });
+              
+              // Update counter
+              updateNotificationCounter();
+            });
+          });
+        }
+      }
+    });
+  </script>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+Django>=4.2.0,<5.0.0
+django-cors-headers>=4.0.0
+djangorestframework>=3.14.0
+# Adaptateur PostgreSQL commenté - nécessite Visual C++ Build Tools
+# psycopg2-binary>=2.8.6,<2.9.0
+# SQLite (pas besoin d'adaptateur supplémentaire)
+sqlparse>=0.4.4
+python-dotenv>=1.0.0
+# Utilisation de wheels précompilés pour éviter les erreurs de compilation
+Pillow>=9.5.0
+django-filter>=23.0
+gunicorn>=21.0.0
+whitenoise>=6.0.0
+# Ajout de WeasyPrint qui était manquant
+WeasyPrint>=60.0  

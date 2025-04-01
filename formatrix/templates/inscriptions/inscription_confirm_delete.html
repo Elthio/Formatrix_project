@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer l'inscription #{{ object.inscription_id }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Confirmation de suppression</h1>
+    <div class="ms-auto">
+      <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
+    </div>
+  </div>
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Attention !</h4>
+          <p class="mb-0">Êtes-vous sûr de vouloir supprimer l'inscription <strong>#{{ object.inscription_id }}</strong> ? Cette action est irréversible.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Informations de l'inscription</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>ID :</th>
+            <td>{{ object.inscription_id }}</td>
+          </tr>
+          <tr>
+            <th>Apprenant :</th>
+            <td>{{ object.apprenant.nom }} {{ object.apprenant.prenom }}</td>
+          </tr>
+          <tr>
+            <th>Séance :</th>
+            <td>{{ object.seance.cours.nom_cours }} - {{ object.seance.date|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Client :</th>
+            <td>{{ object.client.nom }}</td>
+          </tr>
+          <tr>
+            <th>Date d'inscription :</th>
+            <td>{{ object.date_inscription|date:"d/m/Y H:i" }}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'inscriptions:inscription-detail' object.inscription_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

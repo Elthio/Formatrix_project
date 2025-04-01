@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Session Details - {{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Session: {{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }}</h1>
+    <div class="ms-auto">
+      <div class="btn-group">
+        <a href="{% url 'seances:seance-update' seance.pk %}" class="btn btn-warning">
+          <i class="fas fa-edit me-2"></i>Edit
+        </a>
+        <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Back
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %} me-2"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-md-8">
+      <!-- Session Information -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-info-circle me-2"></i>Session Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Course</div>
+                <div class="info-value">
+                  <a href="{% url 'cours:cours-detail' seance.cours.pk %}">
+                    {{ seance.cours.nom_cours }}
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Status</div>
+                <div class="info-value">
+                  <span class="badge {% if seance.statut == 'pas_commence' %}bg-warning{% elif seance.statut == 'en_cours' %}bg-primary{% elif seance.statut == 'termine' %}bg-success{% elif seance.statut == 'annule' %}bg-danger{% endif %}">
+                    {{ seance.get_statut_display }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">{{ seance.date|date:"d/m/Y" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Duration</div>
+                <div class="info-value">{{ seance.duree }} month{{ seance.duree|pluralize }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Price</div>
+                <div class="info-value">{{ seance.prix }} €</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Capacity</div>
+                <div class="info-value">
+                  <span class="{% if registrations_count >= seance.nombre_places %}text-danger{% endif %}">
+                    {{ registrations_count }} / {{ seance.nombre_places }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Location Information -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-map-marker-alt me-2"></i>Location
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Venue</div>
+                <div class="info-value">
+                  <a href="{% url 'lieux:lieu-detail' seance.lieu.pk %}">
+                    {{ seance.lieu.nom }}
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Address</div>
+                <div class="info-value">
+                  {{ seance.lieu.adresse }}
+                  {% if seance.lieu.complement_adresse %}
+                  <br>{{ seance.lieu.complement_adresse }}
+                  {% endif %}
+                  <br>{{ seance.lieu.code_postal }} {{ seance.lieu.ville }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-sticky-note me-2"></i>Notes
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if seance.notes %}
+          <div class="rich-text-content">
+            {{ seance.notes|linebreaks }}
+          </div>
+          {% else %}
+          <p class="text-muted">No notes available for this session.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Registrations Section -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-user-graduate me-2"></i>Registrations
+          </h3>
+          <a href="{% url 'inscriptions:inscription-create' %}?seance={{ seance.pk }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add Registration
+          </a>
+        </div>
+        <div class="card-body">
+          {% if registrations %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped registration-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Status</th>
+                  <th>Registration date</th>
+                  <th>Payment status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for inscription in registrations %}
+                <tr>
+                  <td>
+                    <a href="{% url 'apprenants:apprenant-detail' inscription.apprenant.pk %}">
+                      {{ inscription.apprenant.prenom }} {{ inscription.apprenant.nom }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge {% if inscription.statut == 'confirmée' %}bg-success{% elif inscription.statut == 'en attente' %}bg-warning{% elif inscription.statut == 'annulée' %}bg-danger{% endif %}">
+                      {{ inscription.get_statut_display }}
+                    </span>
+                  </td>
+                  <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
+                  <td>
+                    <span class="badge {% if inscription.statut_paiement == 'payé' %}bg-success{% elif inscription.statut_paiement == 'partiel' %}bg-warning{% elif inscription.statut_paiement == 'impayé' %}bg-danger{% endif %}">
+                      {{ inscription.get_statut_paiement_display }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'inscriptions:inscription-detail' inscription.pk %}" class="btn btn-info" title="View">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="{% url 'inscriptions:inscription-update' inscription.pk %}" class="btn btn-primary" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      {% if inscription.statut != 'annulée' %}
+                      <a href="{% url 'inscriptions:inscription-cancel' inscription.pk %}" class="btn btn-warning" title="Cancel">
+                        <i class="fas fa-ban"></i>
+                      </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">No registrations for this session yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Column -->
+    <div class="col-md-4">
+      <!-- Trainers Section -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-chalkboard-teacher me-2"></i>Assigned Trainers
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if seance.formateurs.all %}
+          <div class="trainer-list">
+            {% for formateur in seance.formateurs.all %}
+            <div class="trainer-item">
+              <div class="trainer-avatar">
+                {% if formateur.photo %}
+                <img src="{{ formateur.photo.url }}" alt="{{ formateur.prenom }} {{ formateur.nom }}">
+                {% else %}
+                <div class="avatar-placeholder">
+                  {{ formateur.prenom|slice:":1" }}{{ formateur.nom|slice:":1" }}
+                </div>
+                {% endif %}
+              </div>
+              <div class="trainer-info">
+                <h5 class="trainer-name">
+                  <a href="{% url 'formateurs:formateur-detail' formateur.pk %}">
+                    {{ formateur.prenom }} {{ formateur.nom }}
+                  </a>
+                </h5>
+                <p class="trainer-title">{{ formateur.specialite }}</p>
+                <p class="trainer-contact">
+                  <i class="fas fa-envelope"></i> {{ formateur.email }}<br>
+                  <i class="fas fa-phone"></i> {{ formateur.telephone }}
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted">No trainers currently assigned to this session.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Absences Section -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-user-slash me-2"></i>Absences
+          </h3>
+          <a href="{% url 'seances:absence_list' seance.pk %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-list"></i> Manage
+          </a>
+        </div>
+        <div class="card-body">
+          {% if absences %}
+          <div class="list-group">
+            {% for absence in absences %}
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ absence.formateur_absent.prenom }} {{ absence.formateur_absent.nom }}</h5>
+                <small>{{ absence.date_absence|date:"d/m/Y" }}</small>
+              </div>
+              <p class="mb-1">Reason: {{ absence.get_raison_display }}</p>
+              {% if absence.est_remplace %}
+              <small class="text-success">
+                <i class="fas fa-check-circle"></i> Replaced by {{ absence.formateur_remplacant.prenom }} {{ absence.formateur_remplacant.nom }}
+              </small>
+              {% else %}
+              <small class="text-danger">
+                <i class="fas fa-exclamation-circle"></i> Not replaced
+              </small>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted">No absences recorded for this session.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Session Actions -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-cogs me-2"></i>Session Actions
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="list-group">
+            {% if seance.statut == 'pas_commence' %}
+            <a href="{% url 'seances:start-session' seance.pk %}" class="list-group-item list-group-item-action text-primary">
+              <i class="fas fa-play me-2"></i>Start Session
+            </a>
+            <a href="{% url 'seances:cancel-session' seance.pk %}" class="list-group-item list-group-item-action text-danger">
+              <i class="fas fa-ban me-2"></i>Cancel Session
+            </a>
+            {% elif seance.statut == 'en_cours' %}
+            <a href="{% url 'seances:complete-session' seance.pk %}" class="list-group-item list-group-item-action text-success">
+              <i class="fas fa-check me-2"></i>Complete Session
+            </a>
+            {% endif %}
+            <a href="{% url 'seances:absence_create' seance.pk %}" class="list-group-item list-group-item-action">
+              <i class="fas fa-user-slash me-2"></i>Report Absence
+            </a>
+            {% if perms.seances.delete_seance %}
+            <a href="{% url 'seances:seance-delete' seance.pk %}" class="list-group-item list-group-item-action text-danger">
+              <i class="fas fa-trash me-2"></i>Delete Session
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="d-flex justify-content-between mt-3">
+    <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to List
+    </a>
+    <div>
+      <a href="{% url 'seances:seance-update' seance.pk %}" class="btn btn-warning">
+        <i class="fas fa-edit me-2"></i>Edit
+      </a>
+      {% if perms.seances.delete_seance %}
+      <a href="{% url 'seances:seance-delete' seance.pk %}" class="btn btn-danger ms-2">
+        <i class="fas fa-trash me-2"></i>Delete
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize DataTables
+    $('.registration-table').DataTable({
+      "pageLength": 10,
+      "language": {
+        "search": "Search:",
+        "lengthMenu": "Show _MENU_ entries",
+        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        "emptyTable": "No data available",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

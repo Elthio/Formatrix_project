@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Absence Record - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Delete Confirmation</h1>
+    <div class="ms-auto">
+      <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+  </div>
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Warning!</h4>
+          <p class="mb-0">Are you sure you want to delete the absence record for <strong>{{ absence.formateur_absent.get_full_name }}</strong> on <strong>{{ absence.date_absence|date:"d/m/Y" }}</strong>? This action cannot be undone.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Absence Details</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Session:</th>
+            <td>{{ absence.seance.cours.nom_cours }} ({{ absence.seance.date|date:"d/m/Y" }})</td>
+          </tr>
+          <tr>
+            <th>Absent Trainer:</th>
+            <td>{{ absence.formateur_absent.get_full_name }}</td>
+          </tr>
+          <tr>
+            <th>Absence Date:</th>
+            <td>{{ absence.date_absence|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Reason:</th>
+            <td>{{ absence.get_raison_display }}</td>
+          </tr>
+          {% if absence.formateur_remplacant %}
+          <tr>
+            <th>Replacement:</th>
+            <td>{{ absence.formateur_remplacant.get_full_name }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th>Status:</th>
+            <td>
+              <span class="badge {% if absence.est_remplace %}bg-success{% else %}bg-danger{% endif %}">
+                {% if absence.est_remplace %}Replaced{% else %}Not replaced{% endif %}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post" action="{% url 'seances:absence_delete' absence.absence_id %}">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirm Deletion
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} 

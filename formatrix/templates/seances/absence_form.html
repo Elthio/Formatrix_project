@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if absence %}
+    Edit Absence - Session on {{ seance.date|date:"d/m/Y" }}
+  {% else %}
+    Report Absence - Session on {{ seance.date|date:"d/m/Y" }}
+  {% endif %}
+  - Formatrix
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if absence %}fa-edit{% else %}fa-user-clock{% endif %}"></i>
+      {% if absence %}
+        Edit Absence
+      {% else %}
+        Report Absence
+      {% endif %}
+    </h1>
+    <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Session Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Session Information
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Course</span>
+            <span class="info-value">{{ seance.cours.nom_cours }}</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">{{ seance.date|date:"d/m/Y" }}</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Location</span>
+            <span class="info-value">{{ seance.lieu.lieu }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Absence Details -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user-times"></i>
+        Absence Details
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.formateur_absent.errors %}has-error{% endif %}">
+            <label for="{{ form.formateur_absent.id_for_label }}">
+              Absent Trainer <span class="text-danger">*</span>
+            </label>
+            {{ form.formateur_absent }}
+            {% if form.formateur_absent.errors %}
+            <div class="error-message">
+              {% for error in form.formateur_absent.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.formateur_absent.help_text %}
+            <small class="form-text text-muted">{{ form.formateur_absent.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.date_absence.errors %}has-error{% endif %}">
+            <label for="{{ form.date_absence.id_for_label }}">
+              Absence Date <span class="text-danger">*</span>
+            </label>
+            {{ form.date_absence }}
+            {% if form.date_absence.errors %}
+            <div class="error-message">
+              {% for error in form.date_absence.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.date_absence.help_text %}
+            <small class="form-text text-muted">{{ form.date_absence.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.raison.errors %}has-error{% endif %}">
+            <label for="{{ form.raison.id_for_label }}">
+              Reason <span class="text-danger">*</span>
+            </label>
+            {{ form.raison }}
+            {% if form.raison.errors %}
+            <div class="error-message">
+              {% for error in form.raison.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.raison.help_text %}
+            <small class="form-text text-muted">{{ form.raison.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.details.errors %}has-error{% endif %}">
+            <label for="{{ form.details.id_for_label }}">
+              Details
+            </label>
+            {{ form.details }}
+            {% if form.details.errors %}
+            <div class="error-message">
+              {% for error in form.details.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.details.help_text %}
+            <small class="form-text text-muted">{{ form.details.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Replacement Trainer -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user-plus"></i>
+        Replacement Trainer
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.formateur_remplacant.errors %}has-error{% endif %}">
+            <label for="{{ form.formateur_remplacant.id_for_label }}">
+              Replacement Trainer
+            </label>
+            {{ form.formateur_remplacant }}
+            {% if form.formateur_remplacant.errors %}
+            <div class="error-message">
+              {% for error in form.formateur_remplacant.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.formateur_remplacant.help_text %}
+            <small class="form-text text-muted">{{ form.formateur_remplacant.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="alert alert-info mt-3">
+        <div class="d-flex">
+          <div class="me-3">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div>
+            <h5 class="alert-heading">Important Note</h5>
+            <p>A replacement is necessary if the absence occurs during the session. If no trainer is available for replacement, please contact the administration as soon as possible.</p>
+            <p class="mb-0">The replacement must have the appropriate skills to ensure the continuity of the training.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Submission buttons -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas {% if absence %}fa-save{% else %}fa-plus{% endif %}"></i>
+        {% if absence %}Update{% else %}Report{% endif %}
+      </button>
+      <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize Select2 for dropdowns
+    if ($.fn.select2) {
+      $('#id_formateur_absent').select2({
+        placeholder: "Select the absent trainer",
+        allowClear: true
+      });
+      
+      $('#id_formateur_remplacant').select2({
+        placeholder: "Select a replacement trainer",
+        allowClear: true
+      });
+      
+      $('#id_raison').select2({
+        placeholder: "Select a reason",
+        allowClear: true
+      });
+    }
+    
+    // Initialize datepicker if available
+    if ($.fn.datepicker) {
+      $('#id_date_absence').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
+      });
+    }
+  });
+</script>
+{% endblock %} 

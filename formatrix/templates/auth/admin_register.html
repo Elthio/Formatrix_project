@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administrator Registration - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .auth-header {
+    background: linear-gradient(135deg, #343a40 0%, #1d2124 100%);
+    padding: 1.5rem;
+  }
+  
+  .input-group-text {
+    width: 40px;
+    justify-content: center;
+  }
+  
+  .toggle-password {
+    cursor: pointer;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn-auth {
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-auth:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .auth-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  
+  .auth-footer a {
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  
+  .auth-footer a:hover {
+    text-decoration: none;
+    opacity: 0.8;
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6 mt-5 mb-5">
+      <div class="card auth-card">
+        <div class="auth-header">
+          <h4 class="text-white mb-0 text-center">
+            <i class="fas fa-user-shield me-2"></i>Administrator Registration
+          </h4>
+          <p class="text-white-50 text-center mb-0 mt-2">Create a Formatrix administrator account</p>
+        </div>
+        <div class="card-body p-4">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} mb-4">
+                <div class="d-flex">
+                  <div class="alert-icon me-2">
+                    {% if message.tags == 'error' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% elif message.tags == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                  </div>
+                  <div class="flex-grow-1">
+                    {{ message }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <label for="{{ form.username.id_for_label }}" class="form-label">
+                <i class="fas fa-user me-1"></i>Username
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white">
+                  <i class="fas fa-user"></i>
+                </span>
+                {{ form.username }}
+              </div>
+              {% if form.username.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.username.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.email.id_for_label }}" class="form-label">
+                <i class="fas fa-envelope me-1"></i>Email
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white">
+                  <i class="fas fa-envelope"></i>
+                </span>
+                {{ form.email }}
+              </div>
+              {% if form.email.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.email.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user-tag me-1"></i>First Name
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark text-white">
+                    <i class="fas fa-user-tag"></i>
+                  </span>
+                  {{ form.first_name }}
+                </div>
+                {% if form.first_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.first_name.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                  <i class="fas fa-user-tag me-1"></i>Last Name
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark text-white">
+                    <i class="fas fa-user-tag"></i>
+                  </span>
+                  {{ form.last_name }}
+                </div>
+                {% if form.last_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.last_name.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.password1.id_for_label }}" class="form-label">
+                <i class="fas fa-lock me-1"></i>Password
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white">
+                  <i class="fas fa-lock"></i>
+                </span>
+                {{ form.password1 }}
+                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="{{ form.password1.id_for_label }}">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              {% if form.password1.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.password1.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.password2.id_for_label }}" class="form-label">
+                <i class="fas fa-lock me-1"></i>Confirm Password
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white">
+                  <i class="fas fa-lock"></i>
+                </span>
+                {{ form.password2 }}
+                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="{{ form.password2.id_for_label }}">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              {% if form.password2.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.password2.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label for="{{ form.admin_code.id_for_label }}" class="form-label">
+                <i class="fas fa-key me-1"></i>Administrator Registration Code
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white">
+                  <i class="fas fa-key"></i>
+                </span>
+                {{ form.admin_code }}
+              </div>
+              {% if form.admin_code.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.admin_code.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group mb-4">
+              <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold btn-auth">
+                <i class="fas fa-user-shield me-2"></i>Create Administrator Account
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="auth-footer">
+          <p class="mb-0">Already have an account? <a href="{% url 'login' %}" class="text-dark">Log in</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add form-control class to form fields generated by Django
+    const formFields = document.querySelectorAll('input, select, textarea');
+    formFields.forEach(field => {
+      if (!field.classList.contains('btn') && !field.classList.contains('toggle-password')) {
+        field.classList.add('form-control');
+      }
+    });
+    
+    // Password visibility toggle buttons
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+          passwordInput.type = 'password';
+          this.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

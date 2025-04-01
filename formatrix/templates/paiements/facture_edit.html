@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Invoice - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas fa-edit"></i>
+      {{ titre }}
+    </h1>
+    <a href="{% url 'paiements:facture-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to list
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Basic Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Basic Information
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Registration <span class="text-danger">*</span></label>
+          {{ form.inscription }}
+          {% if form.inscription.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.inscription.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.paiement.id_for_label }}" class="form-label">Associated payment</label>
+          {{ form.paiement }}
+          {% if form.paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.paiement.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.type_facture.id_for_label }}" class="form-label">Invoice type <span class="text-danger">*</span></label>
+          {{ form.type_facture }}
+          {% if form.type_facture.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.type_facture.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
+          {{ form.statut }}
+          {% if form.statut.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.statut.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Invoice number</label>
+          <input type="text" class="form-control" value="{{ facture.numero_facture }}" readonly>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dates and amounts -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        Dates and amounts
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_emission.id_for_label }}" class="form-label">Issue date <span class="text-danger">*</span></label>
+          {{ form.date_emission }}
+          {% if form.date_emission.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_emission.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_echeance.id_for_label }}" class="form-label">Due date</label>
+          {{ form.date_echeance }}
+          {% if form.date_echeance.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_echeance.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.montant_ht.id_for_label }}" class="form-label">Amount (excl. VAT) (€) <span class="text-danger">*</span></label>
+          {{ form.montant_ht }}
+          {% if form.montant_ht.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.montant_ht.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.taux_tva.id_for_label }}" class="form-label">VAT rate (%) <span class="text-danger">*</span></label>
+          {{ form.taux_tva }}
+          {% if form.taux_tva.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.taux_tva.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Calculated total amount (€)</label>
+          <input type="text" id="montant_ttc_calcule" class="form-control" readonly>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recipient information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user"></i>
+        Recipient information
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_nom.id_for_label }}" class="form-label">Recipient name <span class="text-danger">*</span></label>
+          {{ form.destinataire_nom }}
+          {% if form.destinataire_nom.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_nom.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_email.id_for_label }}" class="form-label">Recipient email <span class="text-danger">*</span></label>
+          {{ form.destinataire_email }}
+          {% if form.destinataire_email.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_email.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.destinataire_adresse.id_for_label }}" class="form-label">Recipient address <span class="text-danger">*</span></label>
+          {{ form.destinataire_adresse }}
+          {% if form.destinataire_adresse.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_adresse.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_telephone.id_for_label }}" class="form-label">Recipient phone</label>
+          {{ form.destinataire_telephone }}
+          {% if form.destinataire_telephone.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_telephone.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_siret.id_for_label }}" class="form-label">SIRET (for companies)</label>
+          {{ form.destinataire_siret }}
+          {% if form.destinataire_siret.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_siret.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Additional information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-file-alt"></i>
+        Additional information
+      </h3>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.conditions_paiement.id_for_label }}" class="form-label">Payment terms</label>
+          {{ form.conditions_paiement }}
+          {% if form.conditions_paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.conditions_paiement.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.notes.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Save
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Apply Bootstrap classes to form fields
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(element) {
+      if (element.tagName === 'SELECT') {
+        element.classList.add('form-select');
+      } else if (element.tagName === 'TEXTAREA') {
+        element.classList.add('form-control');
+        element.rows = 4;
+      } else {
+        element.classList.add('form-control');
+      }
+    });
+    
+    // Calculate total amount
+    const montantHtInput = document.getElementById('{{ form.montant_ht.id_for_label }}');
+    const tauxTvaInput = document.getElementById('{{ form.taux_tva.id_for_label }}');
+    const montantTtcCalcInput = document.getElementById('montant_ttc_calcule');
+    
+    function updateMontantTtc() {
+      const montantHt = parseFloat(montantHtInput.value) || 0;
+      const tauxTva = parseFloat(tauxTvaInput.value) || 0;
+      
+      const montantTva = montantHt * (tauxTva / 100);
+      const montantTtc = montantHt + montantTva;
+      
+      montantTtcCalcInput.value = montantTtc.toFixed(2);
+    }
+    
+    // Update total amount when values change
+    montantHtInput.addEventListener('input', updateMontantTtc);
+    tauxTvaInput.addEventListener('input', updateMontantTtc);
+    
+    // Initialize calculation
+    updateMontantTtc();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Multiple Registration - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<style>
+  .select2-container {
+    width: 100% !important;
+  }
+  
+  .select2-selection--multiple {
+    min-height: 38px !important;
+    border: 1px solid #ced4da !important;
+  }
+  
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+  }
+  
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: white;
+    margin-right: 5px;
+  }
+  
+  .summary-card {
+    margin-top: 20px;
+    display: none;
+  }
+  
+  .summary-item {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .summary-item:last-child {
+    border-bottom: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas fa-users"></i>
+      Multiple Learner Registration
+    </h1>
+    <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> Use this form to register multiple learners for the same session.
+  </div>
+
+  <p class="text-muted">Fill in all required fields marked with a <span class="text-danger">*</span></p>
+
+  <form id="inscriptionMultipleForm" method="post">
+    {% csrf_token %}
+    
+    <!-- Session Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        Session Information
+      </h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="seance" class="form-label">Session <span class="text-danger">*</span></label>
+            <select class="form-select" id="seance" name="seance_id" required>
+              <option value="">Select a session</option>
+              {% for seance in seances %}
+                <option value="{{ seance.seance_id }}" data-places="{{ seance.places_disponibles }}">
+                  {{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }} - {{ seance.places_disponibles }} available seats
+                </option>
+              {% endfor %}
+            </select>
+            <small id="placesInfo" class="form-text text-muted">Select the session for which you want to register the learners.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Client and Learner Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user-graduate"></i>
+        Client and Learner Information
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="client" class="form-label">Client <span class="text-danger">*</span></label>
+            <select class="form-select" id="client" name="clientid" required>
+              <option value="">Select a client</option>
+              {% for client in clients %}
+                <option value="{{ client.clientid }}">{{ client.nom_entite }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">Select the client making the registration.</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="sponsor" class="form-label">Sponsor (optional)</label>
+            <select class="form-select" id="sponsor" name="sponsorid">
+              <option value="">No sponsor</option>
+              {% for client in clients %}
+                <option value="{{ client.clientid }}">{{ client.nom_entite }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">Select a sponsor if applicable.</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="apprenants" class="form-label">Learners <span class="text-danger">*</span></label>
+            <select class="form-select" id="apprenants" name="apprenants_ids" multiple="multiple" required>
+              {% for apprenant in apprenants %}
+                <option value="{{ apprenant.apprenant_id }}">{{ apprenant.nom_apprenant }} {{ apprenant.autres_nom }}</option>
+              {% endfor %}
+            </select>
+            <small id="apprenantsCount" class="form-text text-muted">0 learners selected</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Registration Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-clipboard-list"></i>
+        Registration Information
+      </h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="typeInscription" class="form-label">Registration Type <span class="text-danger">*</span></label>
+            <select class="form-select" id="typeInscription" name="type_inscription">
+              <option value="groupe">Group Registration</option>
+              <option value="individuelle">Individual Registration</option>
+              <option value="entreprise">Company Registration</option>
+              <option value="rse">CSR Registration</option>
+              <option value="ong">NGO Registration</option>
+            </select>
+            <small class="form-text text-muted">Select the registration type.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Register Learners
+      </button>
+      <button type="button" id="previewBtn" class="btn btn-outline-secondary">
+        <i class="fas fa-eye"></i> Preview
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Summary card for preview -->
+<div class="card summary-card" id="summaryCard">
+  <div class="card-header">
+    <h3 class="card-title">Registration Summary</h3>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="closeSummary">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <div class="card-body" id="summaryContent">
+    <!-- Content will be dynamically populated -->
+  </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmation d'inscription</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="confirmationContent">
+        <!-- Le contenu sera rempli dynamiquement -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" id="confirmInscription">Confirmer l'inscription</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de résultat -->
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resultModalLabel">Résultat de l'inscription</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="resultContent">
+        <!-- Le contenu sera rempli dynamiquement -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Initialiser Select2 pour les listes déroulantes
+    $('#client').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Sélectionnez un client',
+      allowClear: true,
+      width: '100%'
+    });
+    
+    $('#sponsor').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Sélectionnez un sponsor (optionnel)',
+      allowClear: true,
+      width: '100%'
+    });
+    
+    $('#apprenants').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Sélectionnez les apprenants',
+      allowClear: true,
+      width: '100%'
+    });
+    
+    $('#typeInscription').select2({
+      theme: 'bootstrap-5',
+      minimumResultsForSearch: Infinity, // Désactiver la recherche pour ce sélecteur
+      width: '100%'
+    });
+    
+    $('#seance').select2({
+      theme: 'bootstrap-5',
+      placeholder: 'Sélectionnez une séance',
+      allowClear: true,
+      width: '100%'
+    });
+    
+    // Mettre à jour le nombre d'apprenants sélectionnés
+    $('#apprenants').on('change', function() {
+      const count = $(this).val() ? $(this).val().length : 0;
+      $('#apprenantsCount').text(count + ' apprenants sélectionnés');
+      
+      // Vérifier si le nombre d'apprenants dépasse les places disponibles
+      const seanceElement = $('#seance option:selected');
+      if (seanceElement.val()) {
+        const placesDisponibles = parseInt(seanceElement.data('places'));
+        if (count > placesDisponibles) {
+          $('#placesInfo').html(`<span class="text-danger">Attention: Vous avez sélectionné plus d'apprenants (${count}) que de places disponibles (${placesDisponibles}).</span>`);
+        } else {
+          $('#placesInfo').html(`<span class="text-success">${placesDisponibles} places disponibles, ${count} apprenants sélectionnés.</span>`);
+        }
+      }
+    });
+    
+    // Mettre à jour les informations sur les places disponibles
+    $('#seance').on('change', function() {
+      const seanceElement = $('option:selected', this);
+      if (seanceElement.val()) {
+        const placesDisponibles = parseInt(seanceElement.data('places'));
+        const apprenantCount = $('#apprenants').val() ? $('#apprenants').val().length : 0;
+        
+        if (apprenantCount > placesDisponibles) {
+          $('#placesInfo').html(`<span class="text-danger">Attention: Vous avez sélectionné plus d'apprenants (${apprenantCount}) que de places disponibles (${placesDisponibles}).</span>`);
+        } else {
+          $('#placesInfo').html(`<span class="text-success">${placesDisponibles} places disponibles, ${apprenantCount} apprenants sélectionnés.</span>`);
+        }
+      } else {
+        $('#placesInfo').text('');
+      }
+    });
+    
+    // Fonction pour récupérer le texte d'une option sélectionnée
+    function getSelectedOptionText(selectId) {
+      return $(`#${selectId} option:selected`).text();
+    }
+    
+    // Aperçu de l'inscription
+    $('#previewBtn').on('click', function() {
+      const clientId = $('#client').val();
+      const seanceId = $('#seance').val();
+      const apprenantsIds = $('#apprenants').val();
+      
+      if (!clientId || !seanceId || !apprenantsIds || apprenantsIds.length === 0) {
+        alert('Veuillez remplir tous les champs obligatoires.');
+        return;
+      }
+      
+      const clientText = getSelectedOptionText('client');
+      const seanceText = getSelectedOptionText('seance');
+      const typeInscription = getSelectedOptionText('typeInscription');
+      const sponsorText = $('#sponsor').val() ? getSelectedOptionText('sponsor') : 'Aucun';
+      
+      // Récupérer les noms des apprenants sélectionnés
+      const apprenantsNames = [];
+      $('#apprenants option:selected').each(function() {
+        apprenantsNames.push($(this).text());
+      });
+      
+      let summaryHtml = `
+        <div class="summary-item">
+          <strong>Client:</strong> ${clientText}
+        </div>
+        <div class="summary-item">
+          <strong>Séance:</strong> ${seanceText}
+        </div>
+        <div class="summary-item">
+          <strong>Type d'inscription:</strong> ${typeInscription}
+        </div>
+        <div class="summary-item">
+          <strong>Sponsor:</strong> ${sponsorText}
+        </div>
+        <div class="summary-item">
+          <strong>Nombre d'apprenants:</strong> ${apprenantsNames.length}
+        </div>
+        <div class="summary-item">
+          <strong>Apprenants:</strong>
+          <ul>
+      `;
+      
+      apprenantsNames.forEach(name => {
+        summaryHtml += `<li>${name}</li>`;
+      });
+      
+      summaryHtml += `
+          </ul>
+        </div>
+      `;
+      
+      $('#summaryContent').html(summaryHtml);
+      $('#summaryCard').show();
+    });
+    
+    // Fermer le résumé
+    $('#closeSummary').on('click', function() {
+      $('#summaryCard').hide();
+    });
+    
+    // Soumettre le formulaire
+    $('#inscriptionMultipleForm').on('submit', function(e) {
+      e.preventDefault();
+      
+      const clientId = $('#client').val();
+      const seanceId = $('#seance').val();
+      const apprenantsIds = $('#apprenants').val();
+      const typeInscription = $('#typeInscription').val();
+      const sponsorId = $('#sponsor').val();
+      
+      if (!clientId || !seanceId || !apprenantsIds || apprenantsIds.length === 0) {
+        alert('Veuillez remplir tous les champs obligatoires.');
+        return;
+      }
+      
+      // Préparer les données pour la confirmation
+      const formData = {
+        clientid: clientId,
+        seance_id: seanceId,
+        apprenants_ids: apprenantsIds,
+        type_inscription: typeInscription,
+        sponsorid: sponsorId
+      };
+      
+      const clientText = getSelectedOptionText('client');
+      const seanceText = getSelectedOptionText('seance');
+      const apprenantsCount = apprenantsIds.length;
+      
+      // Afficher le modal de confirmation
+      let confirmationHtml = `
+        <p>Vous êtes sur le point d'inscrire <strong>${apprenantsCount} apprenant(s)</strong> à la séance <strong>${seanceText}</strong> pour le client <strong>${clientText}</strong>.</p>
+        <p>Êtes-vous sûr de vouloir continuer ?</p>
+      `;
+      
+      $('#confirmationContent').html(confirmationHtml);
+      $('#confirmationModal').modal('show');
+      
+      // Stocker les données du formulaire pour la soumission
+      $('#confirmInscription').data('formData', formData);
+    });
+    
+    // Confirmer l'inscription
+    $('#confirmInscription').on('click', function() {
+      const formData = $(this).data('formData');
+      const csrftoken = $('[name=csrfmiddlewaretoken]').val();
+      
+      // Fermer le modal de confirmation
+      $('#confirmationModal').modal('hide');
+      
+      // Envoyer la requête AJAX
+      $.ajax({
+        url: '{% url "inscriptions:inscrire-multiple" %}',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        success: function(response) {
+          // Afficher le résultat
+          let resultHtml = `
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i> ${response.message}
+            </div>
+            <div>
+              <p><strong>Inscriptions créées:</strong> ${response.created}</p>
+              <p><strong>Inscriptions échouées:</strong> ${response.failed}</p>
+            </div>
+          `;
+          
+          if (response.details && response.details.length > 0) {
+            resultHtml += `<div><strong>Détails:</strong><ul>`;
+            response.details.forEach(detail => {
+              resultHtml += `<li>${detail}</li>`;
+            });
+            resultHtml += `</ul></div>`;
+          }
+          
+          $('#resultContent').html(resultHtml);
+          $('#resultModal').modal('show');
+          
+          // Réinitialiser le formulaire si toutes les inscriptions ont réussi
+          if (response.failed === 0) {
+            $('#inscriptionMultipleForm')[0].reset();
+            $('#client, #seance, #apprenants, #typeInscription, #sponsor').val(null).trigger('change');
+          }
+        },
+        error: function(xhr) {
+          // Afficher l'erreur
+          let errorMessage = 'Une erreur est survenue lors de l\'inscription.';
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMessage = xhr.responseJSON.error;
+          }
+          
+          let resultHtml = `
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-circle"></i> ${errorMessage}
+            </div>
+          `;
+          
+          $('#resultContent').html(resultHtml);
+          $('#resultModal').modal('show');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

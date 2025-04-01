@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .auth-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 1.5rem;
+  }
+  
+  .auth-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .auth-option-btn {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 15px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .auth-option-btn:hover {
+    transform: translateY(-3px);
+  }
+  
+  .auth-option-btn.admin {
+    background-color: #343a40;
+    border-color: #343a40;
+  }
+  
+  .auth-option-btn.admin:hover {
+    background-color: #23272b;
+    border-color: #1d2124;
+  }
+  
+  .auth-option-btn.formateur {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .auth-option-btn.formateur:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  .input-group-text {
+    width: 40px;
+    justify-content: center;
+  }
+  
+  .toggle-password {
+    cursor: pointer;
+  }
+  
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .divider span {
+    padding: 0 1rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .forgot-password {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+  
+  .forgot-password-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #6c757d;
+  }
+  
+  .forgot-password-title i {
+    margin-right: 8px;
+    color: #ffc107;
+  }
+  
+  .forgot-password-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 mt-5 mb-5">
+      <div class="card auth-card">
+        <div class="auth-header">
+          <h4 class="text-white mb-0 text-center">
+            <i class="fas fa-sign-in-alt me-2"></i>Login
+          </h4>
+          <p class="text-white-50 text-center mb-0 mt-2">Access your Formatrix account</p>
+        </div>
+        <div class="card-body p-4">
+          {% if form.errors %}
+          <div class="alert alert-danger mb-4">
+            <div class="d-flex">
+              <div class="alert-icon me-2">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="flex-grow-1">
+                <strong>Error</strong> - Incorrect username or password.
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            <div class="form-group mb-4">
+              <label class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text bg-primary text-white">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required>
+              </div>
+            </div>
+
+            <div class="form-group mb-4">
+              <label class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-primary text-white">
+                  <i class="fas fa-lock"></i>
+                </span>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <div class="form-group mb-4">
+              <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+              </button>
+            </div>
+          </form>
+          
+          <!-- Section de réinitialisation via admin -->
+          <div class="forgot-password" style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-top: 20px;">
+            <div style="display: flex; align-items: center; font-weight: 600; margin-bottom: 10px; color: #6c757d;">
+              <i class="fas fa-key me-2" style="color: #ffc107;"></i> Forgot Password?
+            </div>
+            <div style="font-size: 0.9rem; color: #6c757d; margin-bottom: 10px;">
+              Forgot your password? Contact the system administrator to reset your password.
+            </div>
+            <a href="/formatrix/admin/auth/user/" class="btn btn-warning w-100">
+              <i class="fas fa-user-shield me-2"></i>Access User Management
+            </a>
+          </div>
+          
+          <div class="divider">
+            <span>Don't have an account yet?</span>
+          </div>
+          
+          <div class="auth-options">
+            <a href="{% url 'admin-register' %}" class="btn btn-lg auth-option-btn admin text-white">
+              <i class="fas fa-user-shield me-2"></i>Administrator
+            </a>
+            <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-lg auth-option-btn formateur text-white">
+              <i class="fas fa-chalkboard-teacher me-2"></i>Trainer
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select all password visibility toggle buttons
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    
+    // Add an event listener to each button
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Get the target password field ID
+        const targetId = this.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        // Toggle the field type between 'password' and 'text'
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+          passwordInput.type = 'password';
+          this.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

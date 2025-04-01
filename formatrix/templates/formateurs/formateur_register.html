@@ -1,0 +1,1444 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trainer Registration - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Complete scroll style reset */
+  html, body {
+    overflow-y: scroll !important;
+    height: unset !important;
+    min-height: 100% !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+  
+  .registration-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem 0 3rem;
+    overflow: visible !important;
+  }
+  
+  .registration-card {
+    border-radius: 20px;
+    overflow: visible !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border: none;
+    margin-bottom: 2rem;
+  }
+  
+  .registration-header {
+    background: linear-gradient(135deg, #28a745 0%, #20913c 100%);
+    padding: 1.5rem 2rem;
+    position: relative;
+  }
+  
+  .registration-header h3 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .registration-header p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
+  }
+  
+  .registration-body {
+    padding: 1.5rem;
+    overflow: visible !important;
+    max-height: unset !important;
+    height: auto !important;
+  }
+  
+  .registration-footer {
+    padding: 1.5rem 2rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    text-align: center;
+  }
+  
+  .registration-footer a {
+    color: #28a745;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  
+  .registration-footer a:hover {
+    color: #218838;
+    text-decoration: underline;
+  }
+  
+  /* Progress steps */
+  .progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+  
+  .progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #e9ecef;
+    z-index: -1;
+  }
+  
+  .progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 80px;
+    margin-bottom: 1rem;
+  }
+  
+  .step-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .step-icon i {
+    font-size: 0.9rem;
+  }
+  
+  .step-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-align: center;
+    max-width: 100px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .progress-step.active .step-icon {
+    background-color: #28a745;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 5px rgba(40, 167, 69, 0.2);
+  }
+  
+  .progress-step.active .step-label {
+    color: #28a745;
+    font-weight: 600;
+  }
+  
+  .progress-step.completed .step-icon {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .progress-step.completed .step-icon::after {
+    content: '✓';
+    position: absolute;
+    font-size: 1rem;
+  }
+  
+  .progress-bar-fill {
+    position: absolute;
+    top: 17px;
+    left: 0;
+    height: 3px;
+    background-color: #28a745;
+    z-index: -1;
+    transition: width 0.3s ease;
+  }
+  
+  /* Form styling */
+  .form-step {
+    display: none;
+  }
+  
+  .form-step.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+    position: relative;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #28a745;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+    display: block;
+    font-size: 0.95rem;
+  }
+  
+  .form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+  }
+  
+  .form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+  }
+  
+  .input-group {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+  }
+  
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffffff;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    border-radius: 8px 0 0 8px;
+    width: 45px;
+    justify-content: center;
+  }
+  
+  .input-group > .form-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    border-radius: 0 8px 8px 0;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .toggle-password:hover {
+    color: #343a40;
+  }
+  
+  /* Navigation buttons */
+  .form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    padding: 1rem 0;
+    z-index: 10;
+    border-top: 1px solid #eee;
+  }
+  
+  .btn-navigation {
+    padding: 0.75rem 1.25rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+  }
+  
+  .btn-prev {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    color: #495057;
+  }
+  
+  .btn-prev:hover {
+    background-color: #e9ecef;
+    color: #212529;
+  }
+  
+  .btn-next {
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    color: white;
+  }
+  
+  .btn-next:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  }
+  
+  .btn-submit {
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    color: white;
+  }
+  
+  .btn-submit:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  }
+  
+  /* Error styling */
+  .error-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+  }
+  
+  .has-error .form-control {
+    border-color: #dc3545;
+  }
+  
+  .has-error .input-group-text {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .has-error .form-label {
+    color: #dc3545;
+  }
+  
+  /* Alert styling */
+  .alert {
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: none;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+  .alert-icon {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .registration-container {
+      max-width: 100%;
+      padding: 1rem;
+    }
+    
+    .registration-card {
+      border-radius: 15px;
+    }
+    
+    .registration-body {
+      padding: 1.25rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .registration-header h3 {
+      font-size: 1.3rem;
+    }
+    
+    .registration-body {
+      padding: 1rem;
+      max-height: none !important;
+      overflow-y: visible !important;
+    }
+    
+    .step-label {
+      font-size: 0.75rem;
+      max-width: 80px;
+    }
+    
+    .form-group {
+      min-width: 100%;
+    }
+    
+    .form-navigation {
+      flex-direction: column;
+    }
+    
+    .btn-navigation {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .btn-prev {
+      order: 2;
+    }
+    
+    .btn-next, .btn-submit {
+      order: 1;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .progress-step {
+      min-width: 60px;
+    }
+    
+    .step-icon {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .step-icon i {
+      font-size: 0.8rem;
+    }
+    
+    .step-label {
+      font-size: 0.7rem;
+      max-width: 60px;
+    }
+    
+    .registration-header {
+      padding: 1rem 1.25rem;
+    }
+    
+    .registration-header h3 {
+      font-size: 1.1rem;
+    }
+    
+    .alert {
+      padding: 0.75rem;
+    }
+  }
+  
+  /* Fixed scroll buttons */
+  .scroll-buttons {
+    position: fixed;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+  .top-buttons {
+    top: 80px;
+  }
+  
+  .bottom-buttons {
+    bottom: 20px;
+  }
+  
+  .scroll-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(40, 167, 69, 0.8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .scroll-btn:hover {
+    background-color: rgba(40, 167, 69, 1);
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="container-fluid registration-container">
+  <!-- Emergency scroll button -->
+  <div class="text-end mb-3">
+    <button type="button" class="btn btn-sm btn-secondary" onclick="window.scrollTo(0, document.body.scrollHeight)">
+      <i class="fas fa-arrow-down me-1"></i>Scroll down
+    </button>
+  </div>
+
+  <!-- Fixed scroll buttons -->
+  <div class="scroll-buttons top-buttons">
+    <div class="scroll-btn mb-2" onclick="window.scrollTo(0, document.body.scrollHeight)">
+      <i class="fas fa-arrow-down"></i>
+    </div>
+  </div>
+
+  <div class="scroll-buttons bottom-buttons">
+    <div class="scroll-btn" onclick="window.scrollTo(0, 0)">
+      <i class="fas fa-arrow-up"></i>
+    </div>
+  </div>
+
+  <div class="card registration-card">
+    <div class="registration-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3>
+          <i class="fas fa-chalkboard-teacher me-2"></i>Trainer Registration
+        </h3>
+        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">
+          <i class="fas fa-arrow-left me-1"></i>Back
+        </a>
+      </div>
+      <p>Create your Formatrix trainer account</p>
+    </div>
+    
+    <div class="registration-body">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+            <div class="d-flex align-items-center">
+              <div class="alert-icon">
+                {% if message.tags == 'error' %}
+                  <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'success' %}
+                  <i class="fas fa-check-circle"></i>
+                {% else %}
+                  <i class="fas fa-info-circle"></i>
+                {% endif %}
+              </div>
+              <div>{{ message }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          <div class="d-flex align-items-center">
+            <div class="alert-icon">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div>
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      
+      <!-- Progress Steps -->
+      <div class="progress-steps">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+        
+        <div class="progress-step active" id="step-1-indicator">
+          <div class="step-icon">
+            <i class="fas fa-user-lock"></i>
+          </div>
+          <div class="step-label">User Account</div>
+        </div>
+        
+        <div class="progress-step" id="step-2-indicator">
+          <div class="step-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="step-label">Personal Profile</div>
+        </div>
+        
+        <div class="progress-step" id="step-3-indicator">
+          <div class="step-icon">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <div class="step-label">Trainer Profile</div>
+        </div>
+        
+        <div class="progress-step" id="step-4-indicator">
+          <div class="step-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="step-label">Finalization</div>
+        </div>
+      </div>
+      
+      <form method="post" action="{% url 'formateurs:formateur-register' %}" enctype="multipart/form-data" novalidate id="formateur-form">
+        {% csrf_token %}
+        
+        <!-- Hidden fields to ensure data transmission -->
+        <input type="hidden" name="nom" id="hidden_nom">
+        <input type="hidden" name="prenom" id="hidden_prenom">
+        <input type="hidden" name="specialites" id="hidden_specialites">
+        <input type="hidden" name="niveau_expertise" id="hidden_niveau_expertise">
+        <input type="hidden" name="type_formateur" id="hidden_type_formateur">
+        <input type="hidden" name="disponibilite" id="hidden_disponibilite">
+        
+        <!-- Step 1: Account Creation -->
+        <div class="form-step active" id="step-1">
+          <div class="form-section">
+            <h5 class="section-title">
+              <i class="fas fa-user-lock me-2"></i>Create Your Account
+            </h5>
+            
+            <div class="alert alert-info mb-4">
+              <div class="d-flex align-items-center">
+                <div class="alert-icon me-3">
+                  <i class="fas fa-info-circle fa-lg"></i>
+                </div>
+                <div>
+                  Start by creating your login credentials. This information will allow you to access your trainer dashboard.
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                  Username <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-user"></i>
+                  </span>
+                  {{ form.username }}
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>Choose a unique username that will be used to log in
+                </small>
+                {% if form.username.errors %}
+                  {% for error in form.username.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.email.id_for_label }}">
+                  Email Address <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-envelope"></i>
+                  </span>
+                  {{ form.email }}
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>We will use this address for important communications
+                </small>
+                {% if form.email.errors %}
+                  {% for error in form.email.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.password1.id_for_label }}">
+                  Password <span class="text-danger">*</span>
+                </label>
+                <div class="input-group position-relative">
+                  <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                  {{ form.password1 }}
+                  <button type="button" class="toggle-password" data-target="{{ form.password1.id_for_label }}">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                {% if form.password1.errors %}
+                  {% for error in form.password1.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <small class="text-muted mt-1">
+                    <i class="fas fa-info-circle me-1"></i>Password must contain at least 8 characters, including letters and numbers
+                  </small>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.password2.id_for_label }}">
+                  Confirm Password <span class="text-danger">*</span>
+                </label>
+                <div class="input-group position-relative">
+                  <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                  </span>
+                  {{ form.password2 }}
+                  <button type="button" class="toggle-password" data-target="{{ form.password2.id_for_label }}">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>Enter your password again for confirmation
+                </small>
+                {% if form.password2.errors %}
+                  {% for error in form.password2.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <div></div>
+            <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(1, 2)">
+              Continue to Personal Profile <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Personal Information -->
+        <div class="form-step" id="step-2">
+          <div class="form-section">
+            <h5 class="section-title">
+              <i class="fas fa-user me-2"></i>Your Personal Information
+            </h5>
+            
+            <div class="alert alert-info mb-4">
+              <div class="d-flex align-items-center">
+                <div class="alert-icon me-3">
+                  <i class="fas fa-info-circle fa-lg"></i>
+                </div>
+                <div>
+                  This information will help us get to know you better and personalize your experience.
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group {% if form.first_name.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.first_name.id_for_label }}">
+                  First Name <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-user-tag"></i>
+                  </span>
+                  <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Enter your first name">
+                </div>
+                {% if form.first_name.errors %}
+                  {% for error in form.first_name.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <div class="form-group {% if form.last_name.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.last_name.id_for_label }}">
+                  Last Name <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-user-tag"></i>
+                  </span>
+                  <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Enter your last name">
+                </div>
+                {% if form.last_name.errors %}
+                  {% for error in form.last_name.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.telephone.id_for_label }}">
+                  Phone
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-phone"></i>
+                  </span>
+                  <input type="tel" name="telephone" id="id_telephone" class="form-control" placeholder="Enter your phone number">
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>Recommended format: +33 6 12 34 56 78
+                </small>
+                {% if form.telephone.errors %}
+                  {% for error in form.telephone.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
+                  Date of Birth <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-calendar-alt"></i>
+                  </span>
+                  <input type="date" name="date_naissance" id="id_date_naissance" class="form-control">
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>You must be at least 18 years old
+                </small>
+                {% if form.date_naissance.errors %}
+                  {% for error in form.date_naissance.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="form-section mt-4">
+              <h6 class="mb-3"><i class="fas fa-map-marked-alt me-2"></i>Address</h6>
+              
+              <div class="form-row">
+                <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.adresse.id_for_label }}">
+                    Full Address
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    <textarea name="adresse" id="id_adresse" class="form-control" rows="2" placeholder="Street number, street name, additional address information"></textarea>
+                  </div>
+                  {% if form.adresse.errors %}
+                    {% for error in form.adresse.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.ville.id_for_label }}">
+                    City
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-city"></i>
+                    </span>
+                    <input type="text" name="ville" id="id_ville" class="form-control" placeholder="Enter your city">
+                  </div>
+                  {% if form.ville.errors %}
+                    {% for error in form.ville.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label" for="id_code_postal">
+                    Postal Code
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-map-pin"></i>
+                    </span>
+                    <input type="text" name="code_postal" id="id_code_postal" class="form-control" placeholder="Enter your postal code">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row mt-3">
+              <div class="form-group">
+                <label class="form-label" for="id_photo">
+                  Profile Photo
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-image"></i>
+                  </span>
+                  <input type="file" name="photo" id="id_photo" class="form-control" accept="image/*">
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>Accepted formats: JPG, PNG. Max size: 2 MB
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(2, 1)">
+              <i class="fas fa-arrow-left me-2"></i> Back
+            </button>
+            <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(2, 3)">
+              Continue to Trainer Profile <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Professional Information -->
+        <div class="form-step" id="step-3">
+          <div class="form-section">
+            <h5 class="section-title">
+              <i class="fas fa-briefcase me-2"></i>Your Trainer Profile
+            </h5>
+            
+            <div class="alert alert-info mb-4">
+              <div class="d-flex align-items-center">
+                <div class="alert-icon me-3">
+                  <i class="fas fa-info-circle fa-lg"></i>
+                </div>
+                <div>
+                  This information will help us match you with assignments that fit your profile and skills.
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section mt-3">
+              <h6 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Skills and Expertise</h6>
+              
+              <div class="form-row">
+                <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.specialites.id_for_label }}">
+                    Areas of Specialty <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-tags"></i>
+                    </span>
+                    <textarea name="specialites" id="id_specialites" class="form-control" rows="2" placeholder="Ex: Web Development, Artificial Intelligence, Digital Marketing"></textarea>
+                  </div>
+                  <small class="text-muted mt-1">
+                    <i class="fas fa-info-circle me-1"></i>Separate different specialties with commas
+                  </small>
+                  {% if form.specialites.errors %}
+                    {% for error in form.specialites.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group {% if form.niveau_expertise.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.niveau_expertise.id_for_label }}">
+                    Expertise Level <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-award"></i>
+                    </span>
+                    <select name="niveau_expertise" id="id_niveau_expertise" class="form-control">
+                      <option value="">Select your level</option>
+                      <option value="debutant">Beginner (1-2 years of experience)</option>
+                      <option value="intermediaire">Intermediate (3-5 years of experience)</option>
+                      <option value="expert">Expert (6+ years of experience)</option>
+                    </select>
+                  </div>
+                  {% if form.niveau_expertise.errors %}
+                    {% for error in form.niveau_expertise.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+                <div class="form-group {% if form.type_formateur.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.type_formateur.id_for_label }}">
+                    Trainer Type <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-user-tie"></i>
+                    </span>
+                    <select name="type_formateur" id="id_type_formateur" class="form-control">
+                      <option value="">Select your type</option>
+                      <option value="interne">Internal (permanent employee)</option>
+                      <option value="externe">External (regular contractor)</option>
+                      <option value="consultant">Consultant (occasional assignments)</option>
+                    </select>
+                  </div>
+                  {% if form.type_formateur.errors %}
+                    {% for error in form.type_formateur.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-section mt-4">
+              <h6 class="mb-3"><i class="fas fa-business-time me-2"></i>Professional Information</h6>
+              
+              <div class="form-row">
+                <div class="form-group {% if form.date_embauche.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.date_embauche.id_for_label }}">
+                    Collaboration Start Date
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-calendar-check"></i>
+                    </span>
+                    <input type="date" name="date_embauche" id="id_date_embauche" class="form-control">
+                  </div>
+                  <small class="text-muted mt-1">
+                    <i class="fas fa-info-circle me-1"></i>Date when you would like to start collaborating with us
+                  </small>
+                  {% if form.date_embauche.errors %}
+                    {% for error in form.date_embauche.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+                <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
+                    Availability <span class="text-danger">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-clock"></i>
+                    </span>
+                    <textarea name="disponibilite" id="id_disponibilite" class="form-control" rows="2" placeholder="Ex: Monday-Friday 9am-5pm, available on weekends"></textarea>
+                  </div>
+                  {% if form.disponibilite.errors %}
+                    {% for error in form.disponibilite.errors %}
+                      <div class="error-feedback">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row mt-3">
+              <div class="form-group {% if form.cv.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.cv.id_for_label }}">Curriculum Vitae (CV)</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <input type="file" name="cv" id="id_cv" class="form-control" accept=".pdf,.doc,.docx">
+                </div>
+                <small class="text-muted mt-1">
+                  <i class="fas fa-info-circle me-1"></i>Accepted formats: PDF, DOC, DOCX. Max size: 5 MB
+                </small>
+                {% if form.cv.errors %}
+                  {% for error in form.cv.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+                <label class="form-label" for="{{ form.notes.id_for_label }}">
+                  Additional Information
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-sticky-note"></i>
+                  </span>
+                  <textarea name="notes" id="id_notes" class="form-control" rows="2" placeholder="Any additional information you would like to share"></textarea>
+                </div>
+                {% if form.notes.errors %}
+                  {% for error in form.notes.errors %}
+                    <div class="error-feedback">
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(3, 2)">
+              <i class="fas fa-arrow-left me-2"></i> Back
+            </button>
+            <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(3, 4)">
+              Finalize Registration <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Step 4: Finalization -->
+        <div class="form-step" id="step-4">
+          <div class="form-section">
+            <h5 class="section-title">
+              <i class="fas fa-check-circle me-2"></i>Finalize Your Registration
+            </h5>
+            
+            <div class="alert alert-success mb-4">
+              <div class="d-flex align-items-center">
+                <div class="alert-icon me-3">
+                  <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div>
+                  <strong>You're almost there!</strong> Please verify the information you've entered and accept the terms and conditions to complete your registration.
+                </div>
+              </div>
+            </div>
+            
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Registration Summary</h6>
+              </div>
+              <div class="card-body">
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Username:</strong> <span id="recap-username"></span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span id="recap-email"></span></p>
+                    <p class="mb-1"><strong>Full Name:</strong> <span id="recap-fullname"></span></p>
+                    <p class="mb-1"><strong>Phone:</strong> <span id="recap-telephone"></span></p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="mb-1"><strong>Trainer Type:</strong> <span id="recap-type"></span></p>
+                    <p class="mb-1"><strong>Expertise Level:</strong> <span id="recap-niveau"></span></p>
+                    <p class="mb-1"><strong>Specialties:</strong> <span id="recap-specialites"></span></p>
+                    <p class="mb-1"><strong>Availability:</strong> <span id="recap-disponibilite"></span></p>
+                  </div>
+                </div>
+                <p class="text-muted small">You can edit this information later in your trainer dashboard.</p>
+              </div>
+            </div>
+            
+            <div class="form-row mb-4">
+              <div class="form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="terms_conditions" required>
+                  <label class="form-check-label" for="terms_conditions">
+                    I accept the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a> and the <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">privacy policy</a> <span class="text-danger">*</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="newsletter_consent">
+                  <label class="form-check-label" for="newsletter_consent">
+                    I would like to receive the newsletter and training offers
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(4, 3)">
+              <i class="fas fa-arrow-left me-2"></i> Back
+            </button>
+            <button type="submit" class="btn btn-navigation btn-submit">
+              <i class="fas fa-check me-2"></i> Confirm My Registration
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="registration-footer">
+      <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Immediate initialization script to unlock scrolling
+    setTimeout(function() {
+      document.documentElement.style.overflow = 'scroll';
+      document.body.style.overflow = 'scroll';
+      document.body.style.height = 'auto';
+      document.body.style.position = 'relative';
+      
+      // Unlock all containers
+      const containers = document.querySelectorAll('.container, .container-fluid, .registration-container, .registration-body, .registration-card');
+      containers.forEach(container => {
+        container.style.overflow = 'visible';
+        container.style.height = 'auto';
+        container.style.maxHeight = 'none';
+      });
+    }, 100);
+    
+    // Add form-control class to form fields generated by Django
+    const formFields = document.querySelectorAll('input, select, textarea');
+    formFields.forEach(field => {
+      if (!field.classList.contains('btn') && !field.classList.contains('toggle-password')) {
+        field.classList.add('form-control');
+        
+        // Add placeholders
+        if (field.id.includes('username')) {
+          field.setAttribute('placeholder', 'Choose a username');
+        } else if (field.id.includes('email')) {
+          field.setAttribute('placeholder', 'Enter your email address');
+        } else if (field.id.includes('password1')) {
+          field.setAttribute('placeholder', 'Create a secure password');
+        } else if (field.id.includes('password2')) {
+          field.setAttribute('placeholder', 'Confirm your password');
+        } else if (field.id.includes('first_name')) {
+          field.setAttribute('placeholder', 'Enter your first name');
+        } else if (field.id.includes('last_name')) {
+          field.setAttribute('placeholder', 'Enter your last name');
+        }
+      }
+    });
+    
+    // Password visibility toggle buttons
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+          passwordInput.type = 'password';
+          this.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+      });
+    });
+    
+    // Initialize progress bar
+    updateProgressBar(1);
+    
+    // Ensure form is visible and scrollable
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    
+    // Adjust height for mobile devices
+    adjustMobileHeight();
+    
+    // Readjust height on window resize
+    window.addEventListener('resize', adjustMobileHeight);
+  });
+  
+  // Function to adjust height on mobile
+  function adjustMobileHeight() {
+    // Force scrolling on all key elements
+    document.documentElement.style.overflow = 'scroll';
+    document.documentElement.style.height = '100%';
+    
+    document.body.style.overflow = 'scroll';
+    document.body.style.height = 'auto';
+    document.body.style.minHeight = '100%';
+    document.body.style.position = 'relative';
+    
+    const registrationContainer = document.querySelector('.registration-container');
+    if (registrationContainer) {
+      registrationContainer.style.overflow = 'visible';
+      registrationContainer.style.height = 'auto';
+      registrationContainer.style.minHeight = 'auto';
+    }
+    
+    const registrationBody = document.querySelector('.registration-body');
+    if (registrationBody) {
+      registrationBody.style.overflow = 'visible';
+      registrationBody.style.maxHeight = 'none';
+      registrationBody.style.height = 'auto';
+    }
+    
+    // Unlock potential parent containers
+    const mainContainers = document.querySelectorAll('.container, .container-fluid');
+    mainContainers.forEach(container => {
+      container.style.overflow = 'visible';
+      container.style.height = 'auto';
+    });
+  }
+  
+  // Function to proceed to next step
+  function nextStep(currentStep, nextStep) {
+    // Validate current step (you can add your own validation logic here)
+    if (validateStep(currentStep)) {
+      // Hide current step
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      // Show next step
+      document.getElementById(`step-${nextStep}`).classList.add('active');
+      
+      // Update step indicators
+      document.getElementById(`step-${currentStep}-indicator`).classList.remove('active');
+      document.getElementById(`step-${currentStep}-indicator`).classList.add('completed');
+      document.getElementById(`step-${nextStep}-indicator`).classList.add('active');
+      
+      // Update progress bar
+      updateProgressBar(nextStep);
+      
+      // If we're moving to the summary step, update the information
+      if (nextStep === 4) {
+        updateRecapInfo();
+      }
+      
+      // Scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }
+  
+  // Function to go back to previous step
+  function prevStep(currentStep, prevStep) {
+    // Hide current step
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    // Show previous step
+    document.getElementById(`step-${prevStep}`).classList.add('active');
+    
+    // Update step indicators
+    document.getElementById(`step-${currentStep}-indicator`).classList.remove('active');
+    document.getElementById(`step-${prevStep}-indicator`).classList.add('active');
+    
+    // Update progress bar
+    updateProgressBar(prevStep);
+    
+    // Scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  // Function to update progress bar
+  function updateProgressBar(step) {
+    const totalSteps = 4; // Total number of steps
+    const progressPercentage = (step - 1) / (totalSteps - 1) * 100;
+    document.querySelector('.progress-bar-fill').style.width = `${progressPercentage}%`;
+  }
+  
+  // Basic validation function for each step
+  function validateStep(step) {
+    // You can add specific validation for each step
+    // For now, we'll just return true to allow progression
+    return true;
+  }
+  
+  // Update summary information
+  function updateRecapInfo() {
+    // Get relevant field values and update summary
+    const fullname = document.getElementById('id_prenom').value + ' ' + document.getElementById('id_nom').value;
+    document.getElementById('recap-fullname').textContent = fullname;
+    document.getElementById('recap-email').textContent = document.getElementById('id_email').value;
+    document.getElementById('recap-username').textContent = document.getElementById('id_username').value;
+    document.getElementById('recap-telephone').textContent = document.getElementById('id_telephone').value || 'Not specified';
+    
+    // Other fields
+    const speciality = document.getElementById('id_specialites').value || 'Not specified';
+    document.getElementById('recap-specialites').textContent = speciality;
+    
+    const trainerType = document.getElementById('id_type_formateur');
+    const trainerTypeText = trainerType.options[trainerType.selectedIndex].text;
+    document.getElementById('recap-type').textContent = trainerTypeText;
+    
+    const expertiseLevel = document.getElementById('id_niveau_expertise');
+    const expertiseLevelText = expertiseLevel.options[expertiseLevel.selectedIndex].text;
+    document.getElementById('recap-niveau').textContent = expertiseLevelText;
+    
+    const disponibilite = document.getElementById('id_disponibilite').value || 'Not specified';
+    document.getElementById('recap-disponibilite').textContent = disponibilite;
+  }
+</script>
+{% endblock %}
