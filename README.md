@@ -138,6 +138,11 @@ To use Formatrix on multiple computers within a local network with one computer 
    ```
    
    This will make the server listen on all network interfaces, not just localhost.
+   
+   **Note importante**: Pour Windows, vous pouvez également utiliser la commande suivante:
+   ```
+   python .\manage.py runserver 0.0.0.0:8000
+   ```
 
 4. Ensure your firewall allows connections on port 8000
 
